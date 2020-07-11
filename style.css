@@ -1,0 +1,23 @@
+html,body{
+    margin: 0px;
+}
+.menu{
+    color: white;
+    height: 20px;
+}
+.menu-options{
+    color: white;
+    height: 70px;
+}
+.formulaBar{
+    color: white;
+    height: 18px;
+}
+.cell-containers{
+    color: white;
+    height: calc( 100vh - 20vh );
+}
+.sheets{
+    color: white;
+    
+}

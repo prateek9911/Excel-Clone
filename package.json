@@ -1,0 +1,23 @@
+{
+  "name": "excel-clone",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/G-r-a-z-e-l/Excel-Clone.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/G-r-a-z-e-l/Excel-Clone/issues"
+  },
+  "homepage": "https://github.com/G-r-a-z-e-l/Excel-Clone#readme",
+  "devDependencies": {
+    "electron": "^9.1.0"
+  }
+}
