@@ -1,23 +1,49 @@
 html,body{
     margin: 0px;
+    padding: 0px;
+}
+
+*{
+    box-sizing: border-box;
 }
 .menu{
     color: white;
-    height: 20px;
+    border: 1px solid;
 }
 .menu-options{
     color: white;
+    border: 2px white solid;
     height: 70px;
 }
 .formulaBar{
     color: white;
-    height: 18px;
+    border: 1px aqua solid;
+    height: 25px;
+}
+.text-container{
+    width: 130px;
+    margin-right: -4px;
+}
+.formula-container{
+    width: calc(100% - 130px);
 }
 .cell-containers{
-    color: white;
     height: calc( 100vh - 20vh );
-}
-.sheets{
     color: white;
-    
+    border: 1px green solid;
+    overflow: auto;
 }
+.row{
+    display: flex;
+
+}
+.col{
+    text-align: center;
+    border: 1px solid white;
+    min-width: 75px;
+    height: 22px;
+}
+/* .sheets{
+    color: white;
+    border: 1px pink solid;    
+} */

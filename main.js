@@ -1,5 +1,10 @@
 const { app, BrowserWindow } = require('electron')
-
+const ejs = require("ejs-electron");
+ejs.data({
+  "title": "Excel Clone - 1",
+  "rows": 100,
+  "cols": 26
+})
 function createWindow () {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -11,7 +16,7 @@ function createWindow () {
     }
   })
 
-  win.loadFile('index.html')
+  win.loadFile('index.ejs')
   win.maximize();
   win.removeMenu();
   win.show();

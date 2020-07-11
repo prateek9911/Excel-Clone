@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/G-r-a-z-e-l/Excel-Clone#readme",
   "devDependencies": {
+    "ejs-electron": "^2.0.3",
     "electron": "^9.1.0"
   }
 }
