@@ -31,9 +31,68 @@ html,body{
     height: calc( 100vh - 20vh );
     color: white;
     border: 1px green solid;
+    position: relative;
     overflow: auto;
 }
+
+.top-left-cell{
+    width: 25px;
+    border: 2px solid;
+    height: 25px;
+    position: absolute;
+}
+.top-row{
+    display: flex;
+    position: absolute;
+    left: 28px;
+    top: 0px;
+}
+
+
+.top-row>.cell{
+    min-width: 74px;
+    border: 1px solid;
+    text-align: center;
+    height: 29px;
+    
+}
+
+.left-cell{
+    position: absolute;
+    top: 28px;
+}
+
+.left-cell >.cell{
+    border: 1px solid;
+    width: 29px;
+    height: 20px;
+}
+#grid{
+    position: absolute;
+    left: 28px;
+    top: 29px;
+}
+
 .row{
+    display: flex;
+}
+.row>.cell{
+    min-width: 74px;
+    border: 1px solid;
+    height: 20px;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* .row{
     display: flex;
 
 }
@@ -42,7 +101,7 @@ html,body{
     border: 1px solid white;
     min-width: 75px;
     height: 22px;
-}
+} */
 /* .sheets{
     color: white;
     border: 1px pink solid;    
