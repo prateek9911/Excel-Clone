@@ -1,12 +1,12 @@
 //there will be 4 things - - - -
 // 1.value   2. formula  3. upstream ka array  4. downstream ka array
 
-const $  = require('jquery');
+const $  = require("jquery");
 
 $(document).ready(function (){
 
     let data = [];
-    let lsc;  //last click
+    let lsc;  //last selected cell
 
     $('#grid .cell').on('click', function () {
         
@@ -21,101 +21,160 @@ $(document).ready(function (){
         $('#text-input').val(cidAddr + (rid + 1));
 
         //update formula bar value
-
         
     })
 
-    $('#grid .cell').on('blur', function(){
-        //if value is not changed do nothing
 
+ 
+    $('#grid .cell').on('blur', function(){
+        //when we type anything in cells we want its value to be updated in data  array
+        let {rid, cid} = getIndices(this);
+
+        data[rid][cid].value = $(this).text();
+        console.log(data);
+
+        
+        //if value is not changed do nothing
         //return without doing anything
 
-        //delete formula
 
-        //update dependent cells or dwonstream array
+        //if value is updated delete formula
+
+        //update dependent cells or downstream array
         
     })
 
     $('#formula-input').on('blur', function() {
 
         // find a way to work on last clicked cell
-
+        
+        let cellObject = getCell(lsc);
+        if(cellObject.formula == $(this).val()){
+            return;
+        }
+        
+        let { rid, cid } = getIndices(lsc);
         //delete the exixting formula from that cell
+        if(cellObject.formula){
 
+            deleteFormula(cellObject,lsc);
+        }
+
+        cellObject.formula = $(this).val();
         //set the new formula for that cell
+        setFormula(lsc,cellObject.formula);
 
         //evaluate value from the formula
-
-        //update cell and dependents
-    })Formula 
-
-// 1. Delete formula function
-
-function deleteFormula(cellObject){
+        let nVal = evaluate(cellObject);
+        //update cell and dependents and made changes to UI
+        updateCell(rid, cid, nVal, true);
+    })
 
 
-}
-
-//2. Evaluate function
-
-function evaluate(cell) {
-
-}
-
-//3. Set formula value of cell
-
-    function setFormula(cellObject,formula){
-        formula  = formula.replace('(','').replace(')','');
-        
-        let formulaComponents = formula.split(' ');
-
-        for(let i=0;i<formulaComponents.length;i++){
-
-            //find the alphabet's value i.e from A2 find A
-            let chCode = formulaComponents[i].charCodeAt(0);
-
-            if(chCode>=65 && chCode<=90){
-
-                let upstreamAddress = indicesFromAddress(formulaComponents[i]);
-                let myIndices = getIndices(cellObject);
-                //set my upstream to cells I am dependent on
-                data[myIndices.rid][myIndices.cid].upstream.push({
-                    rid:upstreamAddress.rid,
-                    cid:upstreamAddress.cid
-                })
-
-                //set their downstream
-                //as in jispe me depend kar ra hu uske downstream me mujhe daal do taaki agr wo change
-                //ho to me bh change ho jau
-                data[upstreamAddress.rid][upstreamAddress.cid].downstream.push({
-                    rid : myIndices.rid,
-                    cid : myIndices.cid
-                })
-            }
-        }
-    }
-
-    function getIndices(cellObject){
-        let rid = parseInt($(this).attr('r-id'));
-        let cid = parseInt($(this).attr('c-id'));
+function getIndices(cellObject){
+        let rid = parseInt($(cellObject).attr('r-id'));
+        let cid = parseInt($(cellObject).attr('c-id'));
 
         return {
             rid: rid,
             cid : cid
         }
     }
-
-
-    function indicesFromAddress(cellAddress){
-        let rid = parseInt(cellAddress.substr(1));
-        let cid = cellAddress.charCodeAt(0) - 65;
-
-
-        return {
-            rid : rid -1,
-            cid : cid
-        }
+    function getCell(address){
+        let { rid , cid } = getIndices(address);
+        return data[rid][cid];
     }
+// 1. Delete formula function
+
+function deleteFormula(cellObject,cellElement){
+    cellObject.formula = "";
+    let {rid, cid} = getIndices(cellElement);
+    for (let i=0; i< cellObject.upstream.length; i++){
+        let uso = cellObject.upstream[i];
+        let fuso = db[uso.rid][uso.cid];
+
+        let fArr = fuso.downstream.filter( function (dCell) {
+            return dCell.cid != cid && dCell.rid != rid;
+        })
+        fuso.downstream = fArr;
+    }
+    cellObject.upstream = [];
+
+}
+
+//2. Evaluate function
+
+
+
+//3. Set formula value of cell
+
+    function setFormula(cellElement,formula){
+        console.log("3rd consoel " + formula);
+        //formula --- (A1 + B1)
+        formula  = formula.replace("(", "").replace(")", "");
+        //formula -- A1 +B1
+        let formulaComponents = formula.split(" ");
+        // formula -- [A1 , + , B1]
+        for(let i=0;i<formulaComponents.length;i++){
+
+            //find the alphabet's value i.e from A2 find A
+            let chCode = formulaComponents[i].charCodeAt(0);
+
+            if(chCode>=65 && chCode<=90){
+                let { r, c } = getRC(formulaComponents[i],chCode);
+                let parentCell = data[r][c]
+
+                let { cid, rid} = getIndices(cellElement);
+                
+                let cell = getCell(cellElement);
+                //set my upstream to cells I am dependent on
+                cell.upstream.push({
+                    cid: c,
+                    rid: r
+                })
+
+                //set their downstream
+                //as in jispe me depend kar ra hu uske downstream me mujhe daal do taaki agr wo change
+                //ho to me bh change ho jau
+                parentCell.downstream.push({
+                    cid: cid,
+                    rid:  rid
+                });
+            }
+        }
+        console.log(formula);
+    }
+
+   
+
+    function getRC(cellName, charAt0){
+        let sArr = cellName.split("");
+        sArr.shift();
+        let sRow = sArr.join("");
+        let r = Number(sRow) -1;
+        let c = charAt0 - 65;
+        return { r, c};
+    }
+
+
+    
+
+function evaluate(cellObject) {
+    // upstream me jaunga waha se unki values layenge
+    let formula = cellObject.formula;
+    console.log(formula);
+    for(let i=0; i<cellObject.upstream.length; i++){
+        let cuso = cellObject.upstream[i];
+        let colAddress = String.fromCharCode(cuso.cid +65);
+        let cellAddress = colAddress + (cuso.rid + 1);
+        let fusokivalue = data[cuso.rid][cuso.cid].value;
+        
+        formula = formula.replace(cellAddress, fusokivalue);
+    }
+
+    console.log(formula);
+}
+
 //4. update cell values
 function updateCell(cellObject){
 
@@ -133,8 +192,8 @@ function updateCell(cellObject){
             let row = [];
             $(this).find('.cell').each(function (){
                 let cell = {
-                    value : '',
-                    formula : '',
+                    value : "",
+                    formula : "",
                     upstream : [],
                     downstream : []
                 }

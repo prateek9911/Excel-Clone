@@ -7,16 +7,16 @@ html,body{
     box-sizing: border-box;
 }
 .menu{
-    color: white;
+    color: black;
     border: 1px solid;
 }
 .menu-options{
-    color: white;
+    color: black;
     border: 2px white solid;
     height: 70px;
 }
 .formulaBar{
-    color: white;
+    color: black;
     border: 1px aqua solid;
     height: 25px;
 }
@@ -29,10 +29,11 @@ html,body{
 }
 .cell-containers{
     height: calc( 100vh - 20vh );
-    color: white;
+    color: black;
     border: 1px green solid;
     position: relative;
     overflow: auto;
+    background-color: white;
 }
 
 .top-left-cell{
