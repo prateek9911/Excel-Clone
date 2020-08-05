@@ -29,9 +29,26 @@ $(document).ready(function (){
     $('#grid .cell').on('blur', function(){
         //when we type anything in cells we want its value to be updated in data  array
         let {rid, cid} = getIndices(this);
+        // data[rid][cid].value = $(this).text();
+        
 
-        data[rid][cid].value = $(this).text();
-        console.log(data);
+        let cellObject = getCell(this);
+        //agr kisi cell pe click kar diya hai
+        if(cellObject.value == $(this).html()){
+            lsc = this;
+            return;
+        }
+
+        if( cellObject.formula) {
+            deleteFormula(cellObject , this);
+        }
+
+        cellObject.value = $(this).text();
+
+        updateCell(rid,cid,cellObject.value);
+
+        lsc = this;
+        // console.log(data);
 
         
         //if value is not changed do nothing
@@ -66,6 +83,7 @@ $(document).ready(function (){
 
         //evaluate value from the formula
         let nVal = evaluate(cellObject);
+        console.log(nVal);
         //update cell and dependents and made changes to UI
         updateCell(rid, cid, nVal, true);
     })
@@ -91,15 +109,14 @@ function deleteFormula(cellObject,cellElement){
     let {rid, cid} = getIndices(cellElement);
     for (let i=0; i< cellObject.upstream.length; i++){
         let uso = cellObject.upstream[i];
-        let fuso = db[uso.rid][uso.cid];
+        let fuso = data[uso.rid][uso.cid];
 
         let fArr = fuso.downstream.filter( function (dCell) {
-            return dCell.cid != cid && dCell.rid != rid;
+            return !(dCell.cid == cid && dCell.rid == rid);
         })
         fuso.downstream = fArr;
     }
     cellObject.upstream = [];
-
 }
 
 //2. Evaluate function
@@ -173,10 +190,22 @@ function evaluate(cellObject) {
     }
 
     console.log(formula);
+    return eval(formula);
 }
 
 //4. update cell values
-function updateCell(cellObject){
+function updateCell(rid,cid,nVal){
+    let cellObject = data[rid][cid];
+    cellObject.value = nVal;
+    //update ui
+    $(`#grid .cell[r-id=${rid}][c-id = ${cid}]`).html(nVal);
+    
+    for(let i=0;i<cellObject.downstream.length;i++){
+        let downstremCoordinates = cellObject.downstream[i];
+        let dso = data[downstremCoordinates.rid][downstremCoordinates.cid];
+        let dsoNval = evaluate(dso);
+        updateCell(downstremCoordinates.rid,downstremCoordinates.cid,dsoNval);
+    }
 
 }   
 
@@ -207,3 +236,4 @@ function updateCell(cellObject){
 
     init();
 })
+

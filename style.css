@@ -9,11 +9,14 @@ html,body{
 .menu{
     color: black;
     border: 1px solid;
+    background: azure;
 }
 .menu-options{
+    background: aquamarine;
     color: black;
     border: 2px white solid;
     height: 70px;
+    width: 170px;
 }
 .formulaBar{
     color: black;
