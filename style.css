@@ -29,6 +29,7 @@ html,body{
 }
 .formula-container{
     width: calc(100% - 130px);
+    position: absolute;
 }
 .cell-containers{
     height: calc( 100vh - 20vh );

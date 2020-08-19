@@ -2,7 +2,8 @@
 // 1.value   2. formula  3. upstream ka array  4. downstream ka array
 
 const $  = require("jquery");
-
+const dialog = require("electron").remote.dialog;
+const fs = require("fs");
 $(document).ready(function (){
 
     let data = [];
@@ -22,9 +23,65 @@ $(document).ready(function (){
 
         //update formula bar value
         
+    });
+
+    $("#new").on("click", function () {
+        data = [];
+        $('#grid').find('.row').each(function () {
+
+            let row = [];
+            $(this).find('.cell').each(function (){
+                let cell = {
+                    value : "",
+                    formula : "",
+                    upstream : [],
+                    downstream : []
+                }
+                $(this).html(cell.value);
+                row.push(cell);
+            })
+            data.push(row);
+        })
+        console.log(data);
+        $("#grid .cell").eq(0).trigger("click");
     })
 
+    $("#save").on("click", async function () {
+        // var input = $(document.createElement('input')); 
+        //     input.attr("type", "file");
+        //     input.trigger('click');
+        //     return false;
+        let sdb = await dialog.showOpenDialog();
+        let fp = sdb.filePaths[0];
+        if(fp == undefined){
+            console.log("Plaease select a file");
+            return;
+        }
+        let jsonData = JSON.stringify(data);
+        fs.writeFileSync(fp, jsonData);
+     });
 
+     $("#open").on("click", async function () {
+         let sdb = await dialog.showOpenDialog();
+        let fp = sdb.filePaths[0];
+        if(fp == undefined){
+            console.log("Plaease select a file");
+            return;
+        }
+        let buffer = fs.readFileSync(fp);
+        data = JSON.parse(buffer);
+        let allRows = $("#grid").find(".row");
+        for(let i=0; i< allRows.length; i++){
+            let allCol = $(allRows[i]).find(".cell");
+            for(let j =0; j<allCol.length;j++) {
+
+                $(`#grid .cell[r-id=${i}][c-id = ${j}]`).html(data[i][j].value);
+            }
+        }        
+     });
+
+
+//***********Formula wala kaam **************************/
  
     $('#grid .cell').on('blur', function(){
         //when we type anything in cells we want its value to be updated in data  array
@@ -34,30 +91,26 @@ $(document).ready(function (){
 
         let cellObject = getCell(this);
         //agr kisi cell pe click kar diya hai
+        
+        //if value is not changed do nothing
+        //return without doing anything
         if(cellObject.value == $(this).html()){
             lsc = this;
             return;
         }
 
+        //if value is updated delete formula
         if( cellObject.formula) {
             deleteFormula(cellObject , this);
         }
 
         cellObject.value = $(this).text();
 
+        //update dependent cells or downstream array
         updateCell(rid,cid,cellObject.value);
 
         lsc = this;
         // console.log(data);
-
-        
-        //if value is not changed do nothing
-        //return without doing anything
-
-
-        //if value is updated delete formula
-
-        //update dependent cells or downstream array
         
     })
 
@@ -215,23 +268,24 @@ function updateCell(rid,cid,nVal){
 //initialization function
 
     function init(){
-        data = [];
-        $('#grid').find('.row').each(function () {
+        $("#new").click();
+        // data = [];
+        // $('#grid').find('.row').each(function () {
 
-            let row = [];
-            $(this).find('.cell').each(function (){
-                let cell = {
-                    value : "",
-                    formula : "",
-                    upstream : [],
-                    downstream : []
-                }
-                $(this).html(cell.value);
-                row.push(cell);
-            })
-            data.push(row);
-        })
-        console.log(data);
+        //     let row = [];
+        //     $(this).find('.cell').each(function (){
+        //         let cell = {
+        //             value : "",
+        //             formula : "",
+        //             upstream : [],
+        //             downstream : []
+        //         }
+        //         $(this).html(cell.value);
+        //         row.push(cell);
+        //     })
+        //     data.push(row);
+        // })
+        // console.log(data);
     }
 
     init();
